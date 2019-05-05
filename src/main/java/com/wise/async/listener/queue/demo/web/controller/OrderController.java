@@ -3,6 +3,8 @@
  */
 package com.wise.async.listener.queue.demo.web.controller;
 
+import java.util.concurrent.Callable;
+
 import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,8 +32,8 @@ public class OrderController {
 	@Autowired
 	private DeferredResultHolder deferredResultHolder;
 	
-	@RequestMapping()
-	public DeferredResult<String> order() throws Exception {
+	@RequestMapping("/deferredResult")
+	public DeferredResult<String> deferredResult() throws Exception {
 		log.info("主线程开始");
 		
 		String orderNumber = RandomStringUtils.randomNumeric(8);
@@ -41,6 +43,21 @@ public class OrderController {
 		deferredResultHolder.getMap().put(orderNumber, result);
 		
 		return result;
+	}
+	
+	@RequestMapping("/callable")
+	public Callable<String> callable() {
+		log.info("主线程开始");
+
+		return new Callable<String>() {
+			@Override
+			public String call() throws Exception {
+				log.info("副线程开始");
+				Thread.sleep(1000);
+				log.info("副线程返回");
+				return "success";
+			}
+		};
 	}
 
 }
